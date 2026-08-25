@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jewellery Hub Nepal
 
-## Getting Started
+Multi-jeweller discovery for Nepal: shoppers describe a piece, receive unbiased catalog matches, and continue directly with the jeweller on WhatsApp. Aabhushan Crafts is the mock founding house.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) to `.env.local`. The server uses `gemini-3.6-flash`; without a key, search falls back to deterministic local catalog matching. Gemini's free tier currently has free input/output tokens, but submitted prompts may be used by Google to improve its products.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Funnel analytics
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app records searches, WhatsApp clicks, and jeweller-signup clicks through `/api/leads`. To persist them:
 
-## Learn More
+1. Create a free Supabase project.
+2. Run [supabase/schema.sql](./supabase/schema.sql) in its SQL editor.
+3. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` and Vercel.
 
-To learn more about Next.js, take a look at the following resources:
+Without Supabase credentials, the customer flow still works but events are not persisted.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Live sources
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Nepal gold and silver rates: [Federation of Nepal Gold & Silver Dealers' Associations](https://www.fenegosida.org/), refreshed every 30 minutes.
+- Industry headlines: [Rapaport](https://rapaport.com/) and [Jewellery Business](https://www.jewellerybusiness.com/), refreshed hourly from publisher RSS feeds.
 
-## Deploy on Vercel
+## Checks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test
+npm run lint
+npm run build
+```
