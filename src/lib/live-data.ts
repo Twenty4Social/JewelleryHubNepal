@@ -74,8 +74,8 @@ export async function getMarketData(): Promise<MarketAsset[]> {
   try {
     const date = kathmanduDate();
     const [todayResponse, historyResponse] = await Promise.all([
-      fetch(`${FENEGOSIDA}/today`, { next: { revalidate: 1800 } }),
-      fetch(`${FENEGOSIDA}/monthwisehistory?date=${date}`, { next: { revalidate: 1800 } }),
+      fetch(`${FENEGOSIDA}/today`, { next: { revalidate: 1800 }, signal: AbortSignal.timeout(8_000) }),
+      fetch(`${FENEGOSIDA}/monthwisehistory?date=${date}`, { next: { revalidate: 1800 }, signal: AbortSignal.timeout(8_000) }),
     ]);
     if (!todayResponse.ok) throw new Error(`FENEGOSIDA returned ${todayResponse.status}`);
 
@@ -120,7 +120,7 @@ export async function getMarketData(): Promise<MarketAsset[]> {
 export async function getLiveNews(): Promise<LiveNewsItem[]> {
   const feeds = await Promise.allSettled(
     NEWS_FEEDS.map(async ({ source, url }) => {
-      const response = await fetch(url, { next: { revalidate: 3600 } });
+      const response = await fetch(url, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(8_000) });
       if (!response.ok) throw new Error(`${source} returned ${response.status}`);
       return parseRss(await response.text(), source);
     })

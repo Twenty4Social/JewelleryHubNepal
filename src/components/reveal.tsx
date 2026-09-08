@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 /** Fade-up reveal when scrolled into view. */
@@ -14,23 +15,37 @@ export function Reveal({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || reduce) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "0px 0px -80px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [reduce]);
+
   return (
-    <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}s` }}
+      className={`premium-reveal ${reduce || visible ? "is-visible" : ""} ${className ?? ""}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 /** Letterspaced small-caps kicker with flanking ornaments. */
 export function Kicker({ children }: { children: ReactNode }) {
   return (
-    <p className="flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
+    <p className="flex items-center justify-center gap-3 text-sm font-semibold text-muted">
       <span aria-hidden className="text-gold">✦</span>
       {children}
       <span aria-hidden className="text-gold">✦</span>
@@ -55,7 +70,7 @@ export function SectionHead({
         {title}
       </h2>
       {sub ? (
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted md:text-[15px]">
+        <p className="mx-auto mt-3 max-w-xl text-base text-muted md:text-[15px]">
           {sub}
         </p>
       ) : null}

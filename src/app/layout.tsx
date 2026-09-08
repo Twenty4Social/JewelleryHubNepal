@@ -21,15 +21,16 @@ const notoDeva = Noto_Serif_Devanagari({
 });
 
 export const metadata: Metadata = {
-  title: "Jewellery Hub Nepal — Every jeweller, one conversation",
+  title: "Jewellery Hub Nepal — Shops, jewellery & daily rates",
   description:
-    "Nepal's jewellery ecosystem: discover every verified jeweller through AI-powered search, explore collections, price predictions and jewellery news — then chat directly on WhatsApp.",
+    "Explore Nepal's jewellery shops and collections, ask about your jewellery, and follow published gold and silver rates and industry news.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${fraunces.variable} ${inter.variable} ${notoDeva.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

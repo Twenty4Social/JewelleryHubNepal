@@ -3,16 +3,16 @@
 /* ── Jewellery Hub Nepal — Heritage Luxury tokens ─────────────── */
 @theme inline {
   --color-cream: #f6f0e4;
-  --color-paper: #fbf7ee;
-  --color-pure: #ffffff;
+  --color-paper: #f6f0e4;
+  --color-pure: #f6f0e4;
   --color-burgundy: #5e1f26;
-  --color-burgundy-deep: #45141a;
-  --color-gold: #b08d3e;
-  --color-gold-light: #d8c08a;
-  --color-ink: #241b14;
-  --color-muted: #7a6a55;
-  --color-rise: #3e6b4f;
-  --color-fall: #a03b2e;
+  --color-burgundy-deep: #5e1f26;
+  --color-gold: #5e1f26;
+  --color-gold-light: #5e1f26;
+  --color-ink: #5e1f26;
+  --color-muted: #5e1f26;
+  --color-rise: #5e1f26;
+  --color-fall: #5e1f26;
 
   --font-display: var(--font-fraunces), var(--font-noto-deva), Georgia, serif;
   --font-body: var(--font-inter), var(--font-noto-deva), system-ui, sans-serif;
@@ -20,13 +20,47 @@
 
 html {
   scroll-behavior: smooth;
+  --reveal-duration: 700ms;
+  scroll-padding-top: calc(var(--header-height, 180px) + 16px);
 }
 
 body {
   background-color: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-body);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.47 0 0 0 0 0.33 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  line-height: 1.65;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.jewellery-word {
+  display: inline-block;
+  color: var(--color-cream);
+  font-style: italic;
+  padding-inline: 0.09em;
+  line-height: 1.25;
+}
+
+.premium-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.premium-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .premium-reveal { opacity: 1; transform: none; transition: none; }
 }
 
 ::selection {
@@ -45,11 +79,11 @@ body {
 
 /* wax-seal badge */
 .seal {
-  background: radial-gradient(circle at 35% 30%, #7a2c35, var(--color-burgundy));
+  background: var(--color-burgundy);
   box-shadow:
     inset 0 0 0 2px rgba(246, 240, 228, 0.35),
     inset 0 0 0 5px var(--color-burgundy),
-    inset 0 0 0 6px rgba(216, 192, 138, 0.6);
+    inset 0 0 0 6px rgba(246, 240, 228, 0.6);
 }
 
 /* thin double rule */
@@ -57,3 +91,40 @@ body {
   border-top: 3px double var(--color-gold-light);
   border-bottom: 3px double var(--color-gold-light);
 }
+
+/* Readable, keyboard-accessible controls throughout the buying journey. */
+:where(button, input, textarea, select, summary) { min-height: 48px; }
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid var(--color-burgundy);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 2px var(--color-paper);
+}
+:where(section[id], main[id]) { scroll-margin-top: 24px; }
+html[lang="ne"] body { line-height: 1.85; }
+html[lang="ne"] :where(h1, h2, h3) { line-height: 1.5; }
+.skip-link { position: absolute; left: 16px; top: -100px; padding: 12px 20px; background: var(--color-paper); color: var(--color-burgundy); z-index: 60; }
+.skip-link:focus { top: 12px; }
+
+.site-header { --header-scale: 1.35; --rate-scale: 1.8225; }
+.header-nav { padding-block: calc(.5rem * var(--header-scale)); min-height: calc(4.125rem * var(--header-scale)); }
+.header-brand { font-size: calc(1rem * var(--header-scale)); }
+.header-link, .header-language, .rate-caption, .rate-label { font-size: calc(.875rem * var(--header-scale)); }
+@media (min-width: 1280px) {
+  .header-brand { font-size: calc(1.125rem * var(--header-scale)); }
+  .header-link { font-size: calc(.875rem * var(--header-scale)); }
+}
+.rate-strip { padding-block: calc(0.5rem * var(--rate-scale, 1.35)); }
+.rate-item { min-height: calc(3rem * var(--rate-scale, 1.35)); }
+.rate-price { font-size: calc(0.875rem * var(--rate-scale, 1.35)); line-height: 1.4; }
+#top :where(a, button, input):focus-visible { outline-color: var(--color-cream); }
+
+:where(.bg-burgundy, .bg-burgundy-deep) :where(a, button, input):focus-visible { outline-color: var(--color-cream); }
+
+#top form :where(input, button):focus-visible { outline-color: var(--color-burgundy); }
+
+@keyframes page-arrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-transition { animation: page-arrive 340ms cubic-bezier(.22, 1, .36, 1) both; }
+@media (prefers-reduced-motion: reduce) { .page-transition { animation: none; } }

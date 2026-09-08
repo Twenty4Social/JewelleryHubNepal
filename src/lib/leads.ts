@@ -29,6 +29,7 @@ export async function recordLead(event: LeadEvent): Promise<boolean> {
         query: event.query ?? null,
         source: event.source ?? null,
       }),
+      signal: AbortSignal.timeout(5_000),
       cache: "no-store",
     });
 

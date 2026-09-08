@@ -35,7 +35,7 @@ export function localSearch(query: string, lang: Lang = "en") {
       shop?.specialty.np,
     ].filter(Boolean).join(" "));
     const matches = tokens.reduce((score, token) => score + (haystack.includes(token) ? 1 : 0), 0);
-    const budgetScore = budget ? (product.priceMin <= budget ? 3 : -4) : 0;
+    const budgetScore = budget && product.priceMin > 0 ? (product.priceMin <= budget ? 3 : -4) : 0;
     return { id: product.id, score: matches + budgetScore };
   }).sort((a, b) => b.score - a.score);
 
@@ -44,6 +44,6 @@ export function localSearch(query: string, lang: Lang = "en") {
     productIds: (positive.length ? positive : ranked.slice(0, 5)).map((item) => item.id),
     message: lang === "np"
       ? "तपाईंको विवरणसँग मिल्ने क्याटलगका नजिकका विकल्पहरू।"
-      : "Closest catalog matches for your description.",
+      : "Closest sample designs for your description. Ask the shop to confirm price and materials.",
   };
 }

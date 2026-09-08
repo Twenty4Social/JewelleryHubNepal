@@ -13,6 +13,11 @@ export default function SmoothScroll() {
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    const root = document.documentElement;
+    const unsubscribe = lenis.on("scroll", ({ velocity }) => {
+      const duration = Math.round(900 - Math.min(Math.abs(velocity) / 25, 1) * 500);
+      root.style.setProperty("--reveal-duration", `${duration}ms`);
+    });
 
     let raf = 0;
     const loop = (time: number) => {
@@ -23,6 +28,8 @@ export default function SmoothScroll() {
 
     return () => {
       cancelAnimationFrame(raf);
+      unsubscribe();
+      root.style.removeProperty("--reveal-duration");
       lenis.destroy();
     };
   }, []);
