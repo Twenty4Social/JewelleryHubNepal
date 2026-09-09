@@ -15,17 +15,19 @@ export default function ConversationSearch() {
   const [query, setQuery] = useState("");
   const [reply, setReply] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [tab, setTab] = useState<"chat" | "designs">("chat");
   const dialog = useRef<HTMLDialogElement>(null);
   const log = useRef<HTMLDivElement>(null);
+  const latestTurn = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLInputElement>(null);
   const active = useRef<AbortController | null>(null);
   const busy = turns.at(-1)?.status === "pending";
-  const latest = turns.findLast(turn => turn.status === "done");
-  const results = (latest?.productIds ?? []).flatMap(id => products.find(p => p.id === id) ?? []);
 
   useEffect(() => () => active.current?.abort(), []);
-  useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [turns, tab]);
+  useEffect(() => {
+    if (log.current && latestTurn.current) {
+      log.current.scrollTop += latestTurn.current.getBoundingClientRect().top - log.current.getBoundingClientRect().top - 20;
+    }
+  }, [turns]);
 
   const open = () => { if (!dialog.current?.open) dialog.current?.showModal(); composer.current?.focus(); };
   const ask = async (text: string, retry = false) => {
@@ -40,7 +42,7 @@ export default function ConversationSearch() {
       { role: "assistant", text: `${turn.message}\nSuggested designs: ${turn.productIds.map(id => `${id}: ${products.find(p => p.id === id)?.title.en ?? ""}`).join(", ")}`.slice(0, 1500) },
     ]);
     setTurns([...previous, { query: question, message: "", productIds: [], status: "pending" }]);
-    setReply(""); setTab("chat"); open();
+    setReply(""); open();
     try {
       const response = await fetch("/api/search", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ query: question, history, lang }), signal: controller.signal });
       if (!response.ok) throw new Error(String(response.status));
@@ -65,38 +67,32 @@ export default function ConversationSearch() {
       {!!turns.length && <button onClick={open} className="px-2 py-2 text-base text-cream underline underline-offset-4">{np ? "कुराकानी जारी राख्नुहोस्" : "Continue your conversation"} →</button>}
     </div>
 
-    <dialog ref={dialog} aria-labelledby="search-title" className="search-dialog fixed inset-0 m-auto h-[94dvh] max-h-[94dvh] w-[calc(100%-1rem)] max-w-6xl overflow-hidden rounded-2xl border border-burgundy bg-cream p-0 text-burgundy open:flex open:flex-col md:h-[86dvh] md:w-[calc(100%-3rem)]">
+    <dialog ref={dialog} aria-labelledby="search-title" className="search-dialog fixed inset-0 m-auto h-[94dvh] max-h-[94dvh] w-[calc(100%-1rem)] max-w-5xl overflow-hidden rounded-2xl border border-burgundy bg-cream p-0 text-burgundy open:flex open:flex-col md:h-[86dvh] md:w-[calc(100%-3rem)]">
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-burgundy/20 px-4 py-3 md:px-6">
         <div><h2 id="search-title" className="font-display text-xl md:text-3xl">{np ? "तपाईंको गहना खोजौँ" : "Let’s find your jewellery"}</h2><p className="hidden text-sm sm:block">{np ? "आफ्नो कुरा भन्नुहोस्। सँगै विकल्प छानौँ।" : "Tell us what you have in mind. We’ll explore it together."}</p></div>
         <button onClick={() => dialog.current?.close()} className="shrink-0 rounded-full border border-burgundy px-4 text-base">{np ? "बन्द" : "Close"} ×</button>
       </div>
-      <div className="grid shrink-0 grid-cols-2 border-b border-burgundy/20 md:hidden" aria-label={np ? "खोजको दृश्य" : "Search view"}>
-        <button aria-pressed={tab === "chat"} onClick={() => setTab("chat")} className={tab === "chat" ? "bg-burgundy text-cream" : ""}>{np ? "कुराकानी" : "Conversation"}</button>
-        <button aria-pressed={tab === "designs"} onClick={() => setTab("designs")} className={tab === "designs" ? "bg-burgundy text-cream" : ""}>{np ? "डिजाइन" : "Designs"} ({results.length})</button>
-      </div>
-      <div className="grid min-h-0 flex-1 md:grid-cols-[.9fr_1.1fr]">
-        <div ref={log} role="log" aria-label={np ? "गहना खोजको कुराकानी" : "Jewellery conversation"} aria-live="polite" className={`${tab === "chat" ? "block" : "hidden"} min-h-0 overflow-y-auto overscroll-contain p-4 md:block md:border-r md:border-burgundy/20 md:p-6`}>
+      <div ref={log} aria-label={np ? "गहना खोजको कुराकानी" : "Jewellery conversation"} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 md:px-8 md:py-6">
+        <div className="mx-auto max-w-4xl">
           {!turns.length && <p className="text-lg leading-relaxed">{np ? "कस्तो गहना खोज्दै हुनुहुन्छ? प्रकार, अवसर वा मन पर्ने पसलबाट सुरु गर्नुहोस्।" : "What are you looking for? Start with a jewellery type, an occasion or a favourite shop."}</p>}
-          {turns.map((turn, index) => <div key={index} className="mb-6 space-y-4">
-            <p className="ml-6 whitespace-pre-wrap break-words rounded-2xl rounded-br-sm bg-burgundy px-4 py-3 text-base text-cream"><span className="sr-only">{np ? "तपाईं: " : "You: "}</span>{turn.query}</p>
-            <div className="pr-4 text-base leading-relaxed"><p className="mb-1 text-sm font-semibold">Jewellery Hub</p><p className="whitespace-pre-wrap break-words">{turn.status === "pending" ? (np ? "तपाईंका लागि डिजाइन खोज्दैछौँ…" : "Looking through the collections for you…") : turn.message}</p>
-              {turn.status === "error" && index === turns.length - 1 && <button className="mt-2 underline" onClick={() => void ask(turn.query, true)}>{np ? "फेरि प्रयास" : "Try again"}</button>}
-            </div>
-          </div>)}
-          {!!results.length && <button onClick={() => setTab("designs")} className="rounded-full border border-burgundy px-5 py-2 font-semibold md:hidden">{np ? `${results.length} डिजाइन हेर्नुहोस्` : `See ${results.length} ${results.length === 1 ? "design" : "designs"}`} →</button>}
+          {turns.map((turn, index) => {
+            const designs = turn.productIds.flatMap(id => products.find(product => product.id === id) ?? []);
+            const cards = (items: typeof designs) => items.map(product => <Link key={product.id} href={`/products/${product.id}`} onClick={() => dialog.current?.close()} className="group flex overflow-hidden rounded-xl border border-burgundy/25 md:flex-col">
+              <div className="relative w-28 shrink-0 bg-cream md:aspect-[4/3] md:w-full"><Image src={product.image} alt={pick(lang, product.title)} fill sizes="(max-width: 768px) 112px, 280px" className="object-contain" /></div>
+              <div className="min-w-0 flex-1 p-3 md:p-4"><h3 className="font-display text-lg leading-snug md:text-xl">{pick(lang, product.title)}</h3><p className="mt-1 text-sm">{pick(lang, shops.find(shop => shop.id === product.shopId)!.name)}</p><p className="mt-2 text-sm font-semibold">{productPrice(product, lang)}</p><span className="inline-flex min-h-12 items-center text-base font-semibold underline underline-offset-4">{np ? "विवरण हेर्नुहोस्" : "View details"} →</span></div>
+            </Link>);
+            return <div key={index} ref={index === turns.length - 1 ? latestTurn : undefined} className="mb-8 space-y-4 md:mb-10">
+              <div className="flex justify-end"><p className="max-w-[90%] whitespace-pre-wrap break-words rounded-2xl rounded-br-sm bg-burgundy px-4 py-3 text-base text-cream"><span className="sr-only">{np ? "तपाईं: " : "You: "}</span>{turn.query}</p></div>
+              <div className="max-w-2xl text-base leading-relaxed"><p className="mb-1 text-sm font-semibold">Jewellery Hub</p><p aria-live="polite" className="whitespace-pre-wrap break-words">{turn.status === "pending" ? (np ? "तपाईंका लागि डिजाइन खोज्दैछौँ…" : "Looking through the collections for you…") : turn.message}</p>
+                {turn.status === "error" && index === turns.length - 1 && <button className="mt-2 underline" onClick={() => void ask(turn.query, true)}>{np ? "फेरि प्रयास" : "Try again"}</button>}
+              </div>
+              {!!designs.length && <div aria-label={np ? "सुझाइएका डिजाइन" : `Designs for: ${turn.query}`}>
+                <div className="grid gap-3 md:grid-cols-3">{cards(designs.slice(0, 3))}</div>
+                {designs.length > 3 && <details className="mt-3"><summary className="flex min-h-12 cursor-pointer items-center font-semibold underline underline-offset-4">{np ? `थप ${designs.length - 3} डिजाइन हेर्नुहोस्` : `Show ${designs.length - 3} more designs`} +</summary><div className="mt-3 grid gap-3 md:grid-cols-3">{cards(designs.slice(3))}</div></details>}
+              </div>}
+            </div>;
+          })}
         </div>
-        <section aria-label={np ? "छानिएका डिजाइन" : "Your design shortlist"} className={`${tab === "designs" ? "block" : "hidden"} min-h-0 overflow-y-auto overscroll-contain p-4 md:block md:p-6`} aria-busy={busy}>
-          <div className="mb-4 flex items-center justify-between gap-3"><h3 className="font-display text-2xl">{np ? "तपाईंका लागि डिजाइन" : "Your design shortlist"}</h3><span className="text-sm">{results.length} {np ? "विकल्प" : results.length === 1 ? "design" : "designs"}</span></div>
-          {busy && <p role="status" className="mb-4 text-base">{np ? "विकल्प मिलाउँदैछौँ…" : "Refining your shortlist…"}</p>}
-          {!results.length && !busy && <p>{np ? "अर्को शैली वा गहनाको प्रकार भन्नुहोस्।" : "Try another style or jewellery type to find more options."}</p>}
-          <div className="grid grid-cols-2 gap-3">
-            {results.map(product => <Link key={product.id} href={`/products/${product.id}`} className="overflow-hidden rounded-xl border border-burgundy/25" onClick={() => dialog.current?.close()}>
-              <div className="relative aspect-square"><Image src={product.image} alt={pick(lang, product.title)} fill sizes="(max-width: 768px) 45vw, 25vw" className="object-contain" /></div>
-              <div className="p-3"><p className="text-sm">{pick(lang, shops.find(shop => shop.id === product.shopId)!.name)}</p><h4 className="mt-1 font-display text-lg leading-snug">{pick(lang, product.title)}</h4><p className="mt-2 text-sm font-semibold">{productPrice(product, lang)}</p><span className="mt-3 inline-flex min-h-12 items-center text-sm underline">{np ? "विवरण हेर्नुहोस्" : "View details"} →</span></div>
-            </Link>)}
-          </div>
-          {latest && <p className="mt-4 text-sm">{latest.source === "catalog" ? (np ? "क्याटलगबाट मिलाइएका विकल्प।" : "Matched from the catalogue.") : (np ? "AI को सहयोगमा छानिएका विकल्प।" : "Selected with AI assistance.")} {np ? "मूल्य र शुद्धता पसलसँग पुष्टि गर्नुहोस्।" : "Confirm price and purity with the shop."}</p>}
-        </section>
       </div>
       <div className="shrink-0 border-t border-burgundy/20 bg-cream p-3 md:px-6 md:py-4">
         <form className="flex items-center gap-2 rounded-xl border border-burgundy p-1.5" onSubmit={event => { event.preventDefault(); void ask(reply); }}>
@@ -104,7 +100,7 @@ export default function ConversationSearch() {
           <input ref={composer} id="search-reply" required maxLength={300} value={reply} onChange={event => setReply(event.target.value)} placeholder={np ? "मन पर्ने शैली वा अर्को प्रश्न…" : "A different style, a favourite shop…"} className="min-w-0 flex-1 bg-transparent px-2 py-2 text-base placeholder:text-burgundy/75" />
           <button disabled={busy} className="rounded-lg bg-burgundy px-5 text-base font-semibold text-cream disabled:opacity-60">{np ? "पठाउनुहोस्" : "Send"}</button>
         </form>
-        <div className="mt-1 flex items-center justify-between gap-2 text-sm"><span>{np ? "कुराकानीसँगै विकल्प बदलिन्छन्।" : "Your shortlist follows the conversation."}</span><button onClick={() => { active.current?.abort(); active.current = null; setTurns([]); setReply(""); setQuery(""); setTab("chat"); composer.current?.focus(); }} className="shrink-0 underline">{np ? "नयाँ खोज" : "Start over"}</button></div>
+        <div className="mt-1 flex items-center justify-between gap-2 text-sm"><span>{np ? "कुराकानीसँगै विकल्प बदलिन्छन्।" : "Ask a follow-up to refine these designs."}</span><button onClick={() => { active.current?.abort(); active.current = null; setTurns([]); setReply(""); setQuery(""); composer.current?.focus(); }} className="shrink-0 underline">{np ? "नयाँ खोज" : "Start over"}</button></div>
       </div>
     </dialog>
   </>;
