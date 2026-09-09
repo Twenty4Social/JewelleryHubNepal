@@ -14,7 +14,7 @@ export default function HomeLinks() {
           <Image src={products[10].image} alt={nepali ? "गहनाको नजिकको विवरण" : "A closer look at a jewellery design"} fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
         </div>
         <div>
-          <p className="text-sm font-semibold">{nepali ? "किन्नुअघि बुझ्नुहोस्" : "A little advice. More confidence."}</p>
+          <p className="text-sm font-semibold text-champagne">{nepali ? "किन्नुअघि बुझ्नुहोस्" : "A little advice. More confidence."}</p>
           <h2 className="mt-3 font-display text-3xl leading-tight md:text-5xl">{nepali ? "आफ्नो गहना बुझ्नुहोस्" : "Know your jewellery"}</h2>
           <p className="mt-4 max-w-lg text-lg">{nepali ? "हेरचाह, मर्मत वा शुद्धताबारे प्रश्न? फोटो वा आवाजमा आफ्नो कुरा राख्नुहोस्।" : "Care, repairs or purity? Share a photo or ask your question in your own words."}</p>
           <Link href="/know-your-jewellery" className="mt-6 inline-flex min-h-12 items-center gap-6 rounded-full bg-cream px-6 py-3 font-semibold text-burgundy">{nepali ? "सल्लाह लिनुहोस्" : "Ask about your jewellery"}<span aria-hidden>→</span></Link>

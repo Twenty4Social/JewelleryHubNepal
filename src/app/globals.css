@@ -3,6 +3,7 @@
 /* ── Jewellery Hub Nepal — Heritage Luxury tokens ─────────────── */
 @theme inline {
   --color-cream: #f6f0e4;
+  --color-champagne: #e3c991;
   --color-paper: #f6f0e4;
   --color-pure: #f6f0e4;
   --color-burgundy: #5e1f26;
@@ -38,7 +39,7 @@ a {
 
 .jewellery-word {
   display: inline-block;
-  color: var(--color-cream);
+  color: var(--color-champagne);
   font-style: italic;
   padding-inline: 0.09em;
   line-height: 1.25;
@@ -106,14 +107,14 @@ html[lang="ne"] :where(h1, h2, h3) { line-height: 1.5; }
 .skip-link:focus { top: 12px; }
 
 .site-header { --header-scale: 1.35; --rate-scale: 1.8225; }
-.header-nav { padding-block: calc(.5rem * var(--header-scale)); min-height: calc(4.125rem * var(--header-scale)); }
+.header-nav { padding-block: calc(.25rem + 1.75rem * (var(--header-scale) - 1)); min-height: calc(4.125rem * var(--header-scale)); }
 .header-brand { font-size: calc(1rem * var(--header-scale)); }
 .header-link, .header-language, .rate-caption, .rate-label { font-size: calc(1rem + .5rem * (var(--header-scale) - 1)); }
 @media (min-width: 1280px) {
   .header-brand { font-size: calc(1.125rem * var(--header-scale)); }
   .header-link { font-size: calc(1rem + .5rem * (var(--header-scale) - 1)); }
 }
-.rate-strip { padding-block: calc(0.5rem * var(--rate-scale, 1.35)); }
+.rate-strip { padding-block: calc(.125rem + 2rem * (var(--header-scale) - 1)); row-gap: calc(.125rem + 1.75rem * (var(--header-scale) - 1)); }
 .rate-item { min-height: calc(3rem * var(--rate-scale, 1.35)); }
 .rate-price { font-size: calc(1.125rem + .56rem * (var(--rate-scale, 1.35) - 1)); line-height: 1.4; }
 #top :where(a, button, input):focus-visible { outline-color: var(--color-cream); }
