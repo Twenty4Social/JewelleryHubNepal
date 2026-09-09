@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Fraunces, Inter, Noto_Serif_Devanagari } from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "@/lib/i18n";
-import SmoothScroll from "@/components/smooth-scroll";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -35,7 +34,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <LangProvider>
-          <SmoothScroll />
           {children}
         </LangProvider>
       </body>

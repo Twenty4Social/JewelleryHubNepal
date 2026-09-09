@@ -6,7 +6,7 @@ async function checkBuyerJourney(page) {
   if (await page.playwright.getByText('Menu', { exact: true }).isVisible()) await page.playwright.getByText('Menu', { exact: true }).click();
   await page.playwright.getByRole('button', { name: 'English', exact: true }).click();
   if (await page.playwright.getByText('Close', { exact: true }).isVisible()) await page.playwright.locator('header summary').press('Escape');
-  await page.playwright.getByRole('link', { name: 'Jewellery Hub Nepāl', exact: true }).click();
+  await page.playwright.locator('header').getByRole('link', { name: 'Jewellery Hub Nepāl', exact: true }).click();
   await snapshot();
   check(await page.playwright.locator('#shop-results > a').count() === 3, 'Three featured shops');
   check(await page.playwright.locator('#catalogue-results > a').count() === 3, 'Three featured pieces');
@@ -58,12 +58,12 @@ async function checkNavigationPolish(page) {
     const state = await page.playwright.evaluate(() => ({
       height: document.querySelector('header').getBoundingClientRect().height,
       scroll: window.scrollY,
-      transition: getComputedStyle(document.querySelector('main')).animationName,
+      transition: getComputedStyle(document.querySelector('header')).viewTransitionName,
       overflow: document.documentElement.scrollWidth > window.innerWidth,
       homeLinks: [...document.querySelectorAll('main a')].filter(a => a.textContent.trim() === '← Home').length,
     }));
     check(state.height > 200 && state.scroll === 0, `${link}: full header at page start`);
-    check(state.transition === 'page-arrive', `${link}: page arrival animation`);
+    check(state.transition === 'site-header', `${link}: native transition keeps the header anchored`);
     check(!state.overflow && !state.homeLinks, `${link}: no overflow or redundant Home link`);
   };
   await navigate('Shops', 'Shops');
@@ -75,3 +75,24 @@ async function checkNavigationPolish(page) {
   return 'PASS: large shared header, page transitions, mobile navigation, simplified clinic and owner demo';
 }
 export { checkNavigationPolish };
+
+// Run at desktop and mobile widths with CUA's physical scroll surface.
+export async function checkNativeScrolling(page, surface) {
+  const check = (ok, message) => { if (!ok) throw new Error(message); };
+  await page.playwright.locator('header').getByRole('link', { name: 'Jewellery Hub Nepāl', exact: true }).click();
+  await page.playwright.getByRole('heading', { name: 'Featured shops', exact: true }).waitFor({ state: 'visible' });
+  await page.playwright.domSnapshot();
+  const point = await page.playwright.evaluate(() => [Math.round(innerWidth / 2), Math.round(innerHeight * .8)]);
+  await surface.scroll(point, 'down', 20);
+  await surface.getAXState({ emit: false });
+  const end = await page.playwright.evaluate(() => ({
+    bottom: Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3,
+    overflow: document.documentElement.scrollWidth > innerWidth,
+    compact: document.querySelector('header').getBoundingClientRect().height < 170,
+    redundant: document.body.textContent.includes('How It Works'),
+  }));
+  check(end.bottom && end.compact && !end.overflow && !end.redundant, 'Native scroll reaches footer with compact header and no redundant section');
+  await page.playwright.getByRole('link', { name: 'Back to top', exact: true }).click();
+  await surface.getAXState({ emit: false });
+  return 'PASS: native scrolling reaches the footer after navigation; back-to-top remains accessible';
+}

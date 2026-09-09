@@ -64,13 +64,13 @@ export function SectionHead({
   sub?: string;
 }) {
   return (
-    <Reveal className="mb-12 text-center">
-      <Kicker>{kicker}</Kicker>
+    <Reveal className="mb-8 text-left">
+      <p className="text-sm font-semibold text-burgundy">{kicker}</p>
       <h2 className="mt-4 font-display text-3xl font-medium text-burgundy md:text-[2.6rem] md:leading-tight">
         {title}
       </h2>
       {sub ? (
-        <p className="mx-auto mt-3 max-w-xl text-base text-muted md:text-[15px]">
+        <p className="mt-3 max-w-xl text-base text-muted">
           {sub}
         </p>
       ) : null}

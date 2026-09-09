@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { localSearch } from "../src/lib/catalog-search.ts";
 import { parseRss, getMarketData, getLiveNews } from "../src/lib/live-data.ts";
 import { isRateLimited } from "../src/lib/rate-limit.ts";
-import { getProductDetails, products, shops, productPrice } from "../src/lib/data.ts";
+import { getProductDetails, products, shops, productPrice, rateMovement } from "../src/lib/data.ts";
 import { acceptClinicRequest } from "../src/lib/clinic.ts";
 
 test("local catalog search finds supplied photo designs without inventing prices", () => {
@@ -84,4 +84,26 @@ test("live feeds have cancellation signals so a stalled publisher cannot block p
   assert.deepEqual(await getMarketData(), []);
   assert.deepEqual(await getLiveNews(), []);
   assert.equal(requests, 4);
+});
+
+test("rate arrows distinguish increases, decreases, unchanged and missing records", () => {
+  assert.equal(rateMovement(305400, 304000), "up");
+  assert.equal(rateMovement(4790, 4800), "down");
+  assert.equal(rateMovement(4790, 4790), "unchanged");
+  assert.equal(rateMovement(4790, 0), "unknown");
+  assert.equal(rateMovement(4790, NaN), "unknown");
+});
+
+test("catalogue follow-ups retain the shop and type, while newer types replace older ones", () => {
+  const first = localSearch("floral styles", "en", ["rings from Aabhushan Crafts"]);
+  assert.ok(first.productIds.length);
+  assert.ok(first.productIds.every(id => products.find(p => p.id === id).shopId === "aabhushan"));
+  assert.ok(first.productIds.every(id => products.find(p => p.id === id).category === "rings"));
+  const changed = localSearch("necklaces instead", "en", ["rings from Aabhushan Crafts", "floral styles"]);
+  assert.ok(changed.productIds.length);
+  assert.ok(changed.productIds.every(id => products.find(p => p.id === id).category === "necklaces"));
+  assert.ok(changed.productIds.every(id => products.find(p => p.id === id).shopId === "aabhushan"));
+  const reference = localSearch("Tell me about the second one", "en", ["rings"], first.productIds);
+  assert.deepEqual(reference.productIds, [first.productIds[1]]);
+  assert.match(reference.message, /price, weight and purity/);
 });

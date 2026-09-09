@@ -9,7 +9,9 @@ export async function POST(request: Request) {
 
   let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    const parsed: unknown = await request.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return Response.json({ error: "Expected a search request" }, { status: 400 });
+    body = parsed as Record<string, unknown>;
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -18,9 +20,16 @@ export async function POST(request: Request) {
   const lang: Lang = body.lang === "np" ? "np" : "en";
   if (!query || query.length > 300) return Response.json({ error: "Query must be 1–300 characters" }, { status: 400 });
 
+  const rawHistory = body.history ?? [];
+  if (!Array.isArray(rawHistory) || rawHistory.length > 12 || rawHistory.some(item => !item || typeof item !== "object" || !["user", "assistant"].includes(item.role) || typeof item.text !== "string" || !item.text.trim() || item.text.length > 1500)) {
+    return Response.json({ error: "Invalid conversation history" }, { status: 400 });
+  }
+  const history = rawHistory as { role: "user" | "assistant"; text: string }[];
+  const fallback = () => localSearch(query, lang, history.filter(item => item.role === "user").map(item => item.text), history.findLast(item => item.role === "assistant")?.text.split("Suggested designs:")[1]?.match(/\bp\d+\b/g) ?? []);
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return Response.json({ ...localSearch(query, lang), source: "catalog" });
+    return Response.json({ ...fallback(), source: "catalog" });
   }
 
   try {
@@ -44,9 +53,9 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         systemInstruction: {
-          parts: [{ text: `You are Jewellery Hub Nepal's unbiased catalog search. Rank only by relevance to the shopper. Never favor a shop. This is a sample photo collection. Null prices and To confirm materials are unknown: never claim a design meets a budget or has a particular purity, and never invent availability or specifications. Return nearest honest alternatives when there is no exact match. Reply in ${lang === "np" ? "Nepali" : "English"}.` }],
+          parts: [{ text: `You are Jewellery Hub Nepal's helpful, unbiased jewellery shopping companion. Continue the conversation: remember the buyer's preferences, resolve references to earlier suggestions, and let newer preferences override older ones. Answer in two short sentences followed by one useful follow-up question. Do not repeat the same question if already answered. Rank only by relevance to the shopper. Never favor a shop. This is a sample photo collection. Null prices and To confirm materials are unknown: never claim a design meets a budget or has a particular purity, and never invent availability or specifications. Return nearest honest alternatives when there is no exact match. Reply in ${lang === "np" ? "Nepali" : "English"}.` }],
         },
-        contents: [{
+        contents: [...history.map(item => ({ role: item.role === "assistant" ? "model" : "user", parts: [{ text: item.text }] })), {
           role: "user",
           parts: [{ text: `Shopper query: ${query}\n\nCatalog: ${JSON.stringify(catalog)}` }],
         }],
@@ -80,11 +89,11 @@ export async function POST(request: Request) {
 
     return Response.json({
       productIds,
-      message: typeof parsed.message === "string" ? parsed.message : localSearch(query, lang).message,
+      message: typeof parsed.message === "string" && parsed.message.trim() ? parsed.message.slice(0, 1500) : fallback().message,
       source: "gemini",
     });
   } catch (error) {
     console.error("Gemini catalog search failed", error);
-    return Response.json({ ...localSearch(query, lang), source: "catalog" });
+    return Response.json({ ...fallback(), source: "catalog" });
   }
 }

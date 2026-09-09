@@ -11,8 +11,8 @@ export function ShopCards({ preview = false }: { preview?: boolean }) {
   return <section id="jewellers" className="mx-auto max-w-6xl px-6 py-12">
     {preview && <SectionHead kicker={t("shops.kicker")} title={t("shops.title")} />}
     <div id="shop-results" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {(preview ? shops.slice(0, 3) : shops).map((shop) => <Link key={shop.id} href={`/shops/${shop.id}`} className="group flex flex-col overflow-hidden rounded-2xl border border-gold-light bg-paper hover:border-burgundy">
-        <div className="relative aspect-[4/3] overflow-hidden bg-cream"><Image src={shop.image} alt={lang === "np" ? `${shop.name.np} को नमुना सङ्ग्रह` : `Sample collection for ${shop.name.en}`} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+      {(preview ? shops.slice(0, 3) : shops).map((shop) => <Link key={shop.id} href={`/shops/${shop.id}`} className="group flex flex-col overflow-hidden rounded-xl border border-burgundy/25 bg-paper transition-colors hover:border-burgundy">
+        <div className="relative aspect-[4/3] overflow-hidden bg-cream"><Image src={shop.image} alt={lang === "np" ? `${shop.name.np} को नमुना सङ्ग्रह` : `Sample collection for ${shop.name.en}`} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.025]" /></div>
         <div className="flex grow flex-col p-5">
           <p className="text-sm font-semibold text-burgundy">✓ {t("shops.verified")}</p>
           <h2 className="mt-2 font-display text-2xl leading-snug text-burgundy">{pick(lang, shop.name)}</h2>

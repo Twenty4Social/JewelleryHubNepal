@@ -35,7 +35,7 @@ export default function Categories({ preview = false, shopId }: { preview?: bool
     <div id="catalogue-results" className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {shown.map((product) => {
         const shop = shops.find((s) => s.id === product.shopId)!;
-        return <Link key={product.id} href={`/products/${product.id}`} className="group overflow-hidden rounded-2xl border border-gold-light bg-paper hover:border-burgundy">
+        return <Link key={product.id} href={`/products/${product.id}`} className="group overflow-hidden rounded-xl border border-burgundy/25 bg-paper transition-colors hover:border-burgundy">
           <div className="relative aspect-square overflow-hidden bg-cream"><Image src={product.image} alt={pick(lang, product.title)} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-contain" /></div>
           <div className="p-5"><p className="text-sm text-muted">{pick(lang, shop.name)}</p><h3 className="mt-2 font-display text-2xl leading-snug text-burgundy">{pick(lang, product.title)}</h3>
             <p className="mt-3 font-semibold">{productPrice(product, lang)}</p><span className="mt-3 inline-flex min-h-12 items-center font-semibold text-burgundy underline underline-offset-4">{lang === "np" ? "विवरण हेर्नुहोस्" : "View jewellery details"} →</span>

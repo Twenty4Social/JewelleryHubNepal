@@ -172,3 +172,8 @@ export function getProductDetails(product: Product): ProductDetails {
     },
   };
 }
+
+export function rateMovement(price: number, previous: number) {
+  if (!Number.isFinite(price) || !Number.isFinite(previous) || price <= 0 || previous <= 0) return "unknown";
+  return price > previous ? "up" : price < previous ? "down" : "unchanged";
+}

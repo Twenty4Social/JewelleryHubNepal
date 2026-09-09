@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLang } from "@/lib/i18n";
-import { formatPrice, type MarketAsset } from "@/lib/data";
+import { rateMovement, formatPrice, type MarketAsset } from "@/lib/data";
 
 export default function Header({ rates }: { rates: MarketAsset[] }) {
   const { lang, setLang, t } = useLang();
@@ -52,9 +52,11 @@ export default function Header({ rates }: { rates: MarketAsset[] }) {
       <div className="bg-burgundy text-cream">
         <div className="rate-strip relative mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-x-8 gap-y-1 px-4">
           <Link href="/rates" className="rate-caption absolute left-6 top-1/2 hidden -translate-y-1/2 underline underline-offset-4 xl:block">{lang === "np" ? "पछिल्लो प्रकाशित दर" : "Latest published rates"} ↗</Link>
-          {rates.length ? rates.map((rate) => <Link key={rate.id} aria-label={`${rate.label[lang]} ${formatPrice(rate.price)}`} href="/rates" className="rate-item flex flex-col items-center justify-center text-center sm:flex-row sm:gap-2">
+          {rates.length ? rates.map((rate) => <Link key={rate.id} aria-label={`${rate.label[lang]} ${formatPrice(rate.price)}. ${rateMovement(rate.price, rate.previousPrice) === "unknown" ? (lang === "np" ? "अघिल्लो दर उपलब्ध छैन" : "Previous record unavailable") : `${lang === "np" ? "अघिल्लो प्रकाशित दरको तुलनामा" : "Since the previous published record"}: ${rate.price > rate.previousPrice ? "+" : rate.price < rate.previousPrice ? "−" : ""}${formatPrice(Math.abs(rate.price - rate.previousPrice))}`}`} href="/rates" className="rate-item flex flex-col items-center justify-center text-center sm:flex-row sm:gap-2">
             <span className="rate-label">{lang === "np" ? `${rate.id === "gold" ? "सुन" : "चाँदी"} / तोला` : `${rate.id === "gold" ? "Gold" : "Silver"} / tola`}</span>
-            <strong className="rate-price tabular-nums">{formatPrice(rate.price)}</strong>
+            <strong className="rate-price inline-flex items-center gap-1.5 tabular-nums">{formatPrice(rate.price)}
+              <span className={rateMovement(rate.price, rate.previousPrice) === "up" ? "text-[#6ed59b]" : rateMovement(rate.price, rate.previousPrice) === "down" ? "text-[#ff9292]" : "text-cream"} aria-hidden="true">{rateMovement(rate.price, rate.previousPrice) === "up" ? "↑" : rateMovement(rate.price, rate.previousPrice) === "down" ? "↓" : "—"}</span>
+            </strong>
           </Link>) : <p className="py-2 text-base">{t("market.unavailable")}</p>}
         </div>
       </div>

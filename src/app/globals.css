@@ -20,7 +20,7 @@
 
 html {
   scroll-behavior: smooth;
-  --reveal-duration: 700ms;
+  --reveal-duration: 420ms;
   scroll-padding-top: calc(var(--header-height, 180px) + 16px);
 }
 
@@ -46,7 +46,7 @@ a {
 
 .premium-reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(12px);
   transition:
     opacity var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1),
     transform var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1);
@@ -108,23 +108,40 @@ html[lang="ne"] :where(h1, h2, h3) { line-height: 1.5; }
 .site-header { --header-scale: 1.35; --rate-scale: 1.8225; }
 .header-nav { padding-block: calc(.5rem * var(--header-scale)); min-height: calc(4.125rem * var(--header-scale)); }
 .header-brand { font-size: calc(1rem * var(--header-scale)); }
-.header-link, .header-language, .rate-caption, .rate-label { font-size: calc(.875rem * var(--header-scale)); }
+.header-link, .header-language, .rate-caption, .rate-label { font-size: calc(1rem + .5rem * (var(--header-scale) - 1)); }
 @media (min-width: 1280px) {
   .header-brand { font-size: calc(1.125rem * var(--header-scale)); }
-  .header-link { font-size: calc(.875rem * var(--header-scale)); }
+  .header-link { font-size: calc(1rem + .5rem * (var(--header-scale) - 1)); }
 }
 .rate-strip { padding-block: calc(0.5rem * var(--rate-scale, 1.35)); }
 .rate-item { min-height: calc(3rem * var(--rate-scale, 1.35)); }
-.rate-price { font-size: calc(0.875rem * var(--rate-scale, 1.35)); line-height: 1.4; }
+.rate-price { font-size: calc(1.125rem + .56rem * (var(--rate-scale, 1.35) - 1)); line-height: 1.4; }
 #top :where(a, button, input):focus-visible { outline-color: var(--color-cream); }
 
 :where(.bg-burgundy, .bg-burgundy-deep) :where(a, button, input):focus-visible { outline-color: var(--color-cream); }
 
 #top form :where(input, button):focus-visible { outline-color: var(--color-burgundy); }
 
-@keyframes page-arrive {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Native route crossfade; the shared navigation remains a steady anchor. */
+.site-header { view-transition-name: site-header; }
+::view-transition { pointer-events: none; }
+::view-transition-group(site-header) { animation: none; z-index: 100; }
+::view-transition-old(site-header) { display: none; }
+::view-transition-new(site-header) { animation: none; }
+::view-transition-group(.page-crossfade) { animation-duration: 280ms; }
+::view-transition-old(.page-crossfade) { animation: 180ms ease-out both page-leave; }
+::view-transition-new(.page-crossfade) { animation: 280ms ease-out both page-arrive; }
+@keyframes page-leave { to { opacity: 0; } }
+@keyframes page-arrive { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
-.page-transition { animation: page-arrive 340ms cubic-bezier(.22, 1, .36, 1) both; }
-@media (prefers-reduced-motion: reduce) { .page-transition { animation: none; } }
+
+/* Native dialog contains search without extending or locking the landing page. */
+html:has(.search-dialog[open]) { overflow: hidden; }
+.search-dialog::backdrop { background: rgba(94, 31, 38, .65); }
+.search-dialog[open] { animation: page-arrive 180ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .search-dialog[open] { animation: none; } }
