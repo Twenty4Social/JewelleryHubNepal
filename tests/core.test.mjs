@@ -61,9 +61,10 @@ test("accepting a clinic request assigns one jeweller and raises a ticket", () =
 
 test("the five named shops each have eleven distinct local collection photos", () => {
   assert.deepEqual(shops.map((s) => s.name.en), ["Aabhushan Crafts", "Guna Jyasha Pasa", "Guheswori Ornaments Workshop", "Siddhi Binayak Jewellers", "Dakshinkali Ornaments"]);
-  assert.equal(products.length, 55);
-  assert.equal(new Set(products.map((p) => p.image)).size, 55);
-  for (const shop of shops) assert.equal(products.filter((p) => p.shopId === shop.id).length, 11);
+  const photoProducts = products.filter(p => !p.collection);
+  assert.equal(photoProducts.length, 55);
+  assert.equal(new Set(photoProducts.map((p) => p.image)).size, 55);
+  for (const shop of shops) assert.equal(photoProducts.filter((p) => p.shopId === shop.id).length, 11);
   for (const product of products) {
     assert.ok(shops.some((s) => s.id === product.shopId));
     assert.ok(existsSync(new URL(`../public${product.image}`, import.meta.url)));
@@ -106,4 +107,22 @@ test("catalogue follow-ups retain the shop and type, while newer types replace o
   const reference = localSearch("Tell me about the second one", "en", ["rings"], first.productIds);
   assert.deepEqual(reference.productIds, [first.productIds[1]]);
   assert.match(reference.message, /price, weight and purity/);
+});
+
+
+test("silver and diamond searches return relevant sample collections in both languages", () => {
+  for (const [query, collection] of [["silver", "silver"], ["diamond", "diamond"], ["चाँदी", "silver"], ["हीरा", "diamond"]]) {
+    const result = localSearch(query);
+    assert.equal(result.productIds.length, 5);
+    assert.ok(result.productIds.every(id => products.find(p => p.id === id).collection === collection));
+  }
+  const rings = localSearch("silver rings");
+  assert.equal(rings.productIds.length, 2);
+  const changed = localSearch("diamond instead", "en", ["silver rings"]);
+  assert.equal(changed.productIds.length, 2);
+  assert.ok(changed.productIds.every(id => {
+    const p = products.find(p => p.id === id);
+    return p.collection === "diamond" && p.category === "rings";
+  }));
+  assert.equal(new Set(products.map(p => p.id)).size, products.length);
 });

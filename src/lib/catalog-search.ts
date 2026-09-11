@@ -23,6 +23,7 @@ export function localSearch(query: string, lang: Lang = "en", previousQueries: s
     ["necklaces", /necklace|choker|mala|हार|माला/i], ["bracelets", /bracelet|bangle|चुरा|बाला/i], ["sets", /\bsets?\b|सेट/i],
   ];
   const category = [...conversation].reverse().map(text => categoryPatterns.find(([, pattern]) => pattern.test(text))?.[0]).find(Boolean);
+  const collection = [...conversation].reverse().map(text => /silver|चाँदी|चांदी/i.test(text) ? "silver" : /diamond|हीरा|हिरा/i.test(text) ? "diamond" : undefined).find(Boolean);
   const shopMention = [...conversation].reverse().map(text => /any shop|all shops|सबै पसल|जुनसुकै पसल/i.test(text) ? "all" : shops.find(shop => normalize(text).includes(normalize(shop.name.en)) || normalize(text).includes(normalize(shop.name.np)))?.id).find(Boolean);
   const shopId = shopMention === "all" ? undefined : shopMention;
   const normalized = normalize(conversation.join(" "));
@@ -32,12 +33,13 @@ export function localSearch(query: string, lang: Lang = "en", previousQueries: s
     ? Math.max(0, ...numbers.filter((value) => value >= 1000))
     : 0;
 
-  const ranked = products.filter(product => (!category || product.category === category) && (!shopId || product.shopId === shopId)).map((product) => {
+  const ranked = products.filter(product => (!collection || product.collection === collection) && (!category || product.category === category) && (!shopId || product.shopId === shopId)).map((product) => {
     const shop = shops.find((item) => item.id === product.shopId);
     const haystack = normalize([
       product.title.en,
       product.title.np,
       product.metal,
+      product.collection,
       product.category,
       product.occasion.en,
       product.occasion.np,

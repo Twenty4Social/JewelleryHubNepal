@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         city: shop.city,
         category: product.category,
         metal: product.metal,
+        collection: product.collection,
         occasion: product.occasion,
         priceMin: product.priceMin || null,
         priceMax: product.priceMax ?? (product.priceMin || null),
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         systemInstruction: {
-          parts: [{ text: `You are Jewellery Hub Nepal's helpful, unbiased jewellery shopping companion. Continue the conversation: remember the buyer's preferences, resolve references to earlier suggestions, and let newer preferences override older ones. Answer in two short sentences followed by one useful follow-up question. Do not repeat the same question if already answered. Rank only by relevance to the shopper. Never favor a shop. This is a sample photo collection. Null prices and To confirm materials are unknown: never claim a design meets a budget or has a particular purity, and never invent availability or specifications. Return nearest honest alternatives when there is no exact match. Reply in ${lang === "np" ? "Nepali" : "English"}.` }],
+          parts: [{ text: `You are Jewellery Hub Nepal's helpful, unbiased jewellery shopping companion. Continue the conversation: remember the buyer's preferences, resolve references to earlier suggestions, and let newer preferences override older ones. Answer in two short sentences followed by one useful follow-up question. Do not repeat the same question if already answered. Rank only by relevance to the shopper. Never favor a shop. This is a sample catalogue containing photos and labelled illustrations. Collection names describe sample design themes, not verified materials. Null prices and To confirm materials are unknown: never claim a design meets a budget or has a particular purity, and never invent availability or specifications. Return nearest honest alternatives when there is no exact match. Reply in ${lang === "np" ? "Nepali" : "English"}.` }],
         },
         contents: [...history.map(item => ({ role: item.role === "assistant" ? "model" : "user", parts: [{ text: item.text }] })), {
           role: "user",

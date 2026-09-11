@@ -24,6 +24,7 @@ export type Product = {
   priceMax?: number;
   metal: "Gold" | "925 Silver" | "Gold Plated" | "Rose Gold" | "To confirm";
   category: "rings" | "earrings" | "necklaces" | "bracelets" | "chains" | "sets";
+  collection?: "silver" | "diamond"; // Sample design theme, not verified material.
   occasion: L;
   image: string;
 };
@@ -141,7 +142,23 @@ export const products: Product[] = [
   {"id": "p53", "title": {"en": "Linked Floral Necklace", "np": "जोडिएको फूल बुट्टे माला"}, "shopId": "guheswori-ornaments-workshop", "priceMin": 0, "metal": "To confirm", "category": "necklaces", "occasion": {"en": "Occasion wear", "np": "विशेष अवसर"}, "image": "/images/jewellery/guheswori-ornaments-workshop/p53.jpeg"},
   {"id": "p54", "title": {"en": "Bell Jhumka Earrings", "np": "घण्टी आकारका झुम्का"}, "shopId": "siddhi-binayak-jewellers", "priceMin": 0, "metal": "To confirm", "category": "earrings", "occasion": {"en": "Occasion wear", "np": "विशेष अवसर"}, "image": "/images/jewellery/siddhi-binayak-jewellers/p54.jpeg"},
   {"id": "p55", "title": {"en": "Crescent Drop Necklace", "np": "चन्द्र आकारको लोकेट माला"}, "shopId": "dakshinkali-ornaments", "priceMin": 0, "metal": "To confirm", "category": "necklaces", "occasion": {"en": "Occasion wear", "np": "विशेष अवसर"}, "image": "/images/jewellery/dakshinkali-ornaments/p55.jpeg"},
+  {"id": "p56", "title": {"en": "Silver Classic Band (Sample)", "np": "चाँदीको साधारण औंठी (नमुना)"}, "shopId": "aabhushan", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "rings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p56.svg"},
+  {"id": "p57", "title": {"en": "Silver Twist Ring (Sample)", "np": "चाँदीको घुमाउरो औंठी (नमुना)"}, "shopId": "guna-jyasha-pasa", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "rings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p57.svg"},
+  {"id": "p58", "title": {"en": "Silver Hoop Earrings (Sample)", "np": "चाँदीका गोलो झुम्का (नमुना)"}, "shopId": "guheswori-ornaments-workshop", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "earrings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p58.svg"},
+  {"id": "p59", "title": {"en": "Silver Drop Earrings (Sample)", "np": "चाँदीका थोपा झुम्का (नमुना)"}, "shopId": "siddhi-binayak-jewellers", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "earrings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p59.svg"},
+  {"id": "p60", "title": {"en": "Silver Pendant Necklace (Sample)", "np": "चाँदीको लोकेट माला (नमुना)"}, "shopId": "dakshinkali-ornaments", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "necklaces", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p60.svg"},
+  {"id": "p61", "title": {"en": "Silver Cuff Bracelet (Sample)", "np": "चाँदीको खुला ब्रेसलेट (नमुना)"}, "shopId": "aabhushan", "priceMin": 0, "metal": "To confirm", "collection": "silver", "category": "bracelets", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p61.svg"},
+  {"id": "p62", "title": {"en": "Diamond Solitaire Ring (Sample)", "np": "हीराको सोलिटेयर औंठी (नमुना)"}, "shopId": "guna-jyasha-pasa", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "rings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p62.svg"},
+  {"id": "p63", "title": {"en": "Diamond Halo Ring (Sample)", "np": "हीराको हलो औंठी (नमुना)"}, "shopId": "guheswori-ornaments-workshop", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "rings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p63.svg"},
+  {"id": "p64", "title": {"en": "Diamond Stud Earrings (Sample)", "np": "हीराका टप (नमुना)"}, "shopId": "siddhi-binayak-jewellers", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "earrings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p64.svg"},
+  {"id": "p65", "title": {"en": "Diamond Drop Earrings (Sample)", "np": "हीराका थोपा झुम्का (नमुना)"}, "shopId": "dakshinkali-ornaments", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "earrings", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p65.svg"},
+  {"id": "p66", "title": {"en": "Diamond Pendant Necklace (Sample)", "np": "हीराको लोकेट माला (नमुना)"}, "shopId": "aabhushan", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "necklaces", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p66.svg"},
+  {"id": "p67", "title": {"en": "Diamond Tennis Bracelet (Sample)", "np": "हीराको टेनिस ब्रेसलेट (नमुना)"}, "shopId": "guna-jyasha-pasa", "priceMin": 0, "metal": "To confirm", "collection": "diamond", "category": "bracelets", "occasion": {"en": "Sample design", "np": "नमुना डिजाइन"}, "image": "/images/jewellery/samples/p67.svg"},
 ];
+
+for (const category of categories) {
+  category.count = products.filter(product => product.category === category.id).length;
+}
 
 export function waLink(number: string, message: string): string {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
