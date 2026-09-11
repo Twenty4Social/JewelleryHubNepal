@@ -39,6 +39,9 @@ export default function ProductDetail({ productId }: { productId: string }) {
               <Image src={product.image} alt={pick(lang, product.title)} fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-contain transition duration-1000 hover:scale-[1.025]" />
               <span className="absolute left-5 top-5 rounded-full bg-paper/90 px-4 py-2 text-sm font-semibold text-burgundy backdrop-blur">{lang === "np" ? "नमुना डिजाइन" : "Sample design"}</span>
             </div>
+            {product.photoCredit && <p className="mt-3 text-sm text-muted">
+              {lang === "np" ? "सन्दर्भ फोटो: " : "Reference photo: "}<a href={product.photoCredit.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">{product.photoCredit.name} / Pexels</a>
+            </p>}
           </Reveal>
 
           <Reveal delay={0.08} className="flex flex-col justify-center">
@@ -53,7 +56,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
             <p className="mt-7 font-display text-lg leading-8 text-ink/80">{pick(lang, details.description)}</p>
 
             <div className="mt-8 rounded-[1.5rem] border border-gold-light bg-cream/60 p-5">
-              <p className="text-sm font-semibold text-muted">{labels.available}</p>
+              <p className="text-sm font-semibold text-muted">{product.photoCredit ? (lang === "np" ? "यस्तै डिजाइनबारे सोध्नुहोस्" : "Ask about similar designs") : labels.available}</p>
               <div className="mt-3 flex items-center justify-between gap-5">
                 <div>
                   <p className="font-display text-xl text-burgundy">{pick(lang, shop.name)}</p>
