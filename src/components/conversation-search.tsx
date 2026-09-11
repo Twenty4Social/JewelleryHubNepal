@@ -63,7 +63,7 @@ export default function ConversationSearch() {
       <button disabled={busy} className="min-h-12 rounded-xl bg-burgundy px-4 font-semibold text-cream disabled:opacity-60">{t("hero.ask")}</button>
     </form>
     <div className="mt-3 flex flex-wrap gap-2">
-      {[t("chip.1"), t("chip.2")].map(chip => <button key={chip} disabled={busy} onClick={() => void ask(chip)} className="rounded-full border border-cream/40 px-4 py-2 text-sm text-cream disabled:opacity-60">{chip}</button>)}
+      {(np ? ["सुन", "चाँदी", "हीरा"] : ["Gold", "Silver", "Diamond"]).map(chip => <button key={chip} disabled={busy} onClick={() => void ask(chip)} className="rounded-full border border-cream/40 px-4 py-2 text-sm text-cream disabled:opacity-60">{chip}</button>)}
       {!!turns.length && <button onClick={open} className="px-2 py-2 text-base text-cream underline underline-offset-4">{np ? "कुराकानी जारी राख्नुहोस्" : "Continue your conversation"} →</button>}
     </div>
 

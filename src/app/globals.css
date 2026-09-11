@@ -142,7 +142,7 @@ html[lang="ne"] :where(h1, h2, h3) { line-height: 1.5; }
 }
 
 /* Native dialog contains search without extending or locking the landing page. */
-html:has(.search-dialog[open]) { overflow: hidden; }
-.search-dialog::backdrop { background: rgba(94, 31, 38, .65); }
-.search-dialog[open] { animation: page-arrive 180ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .search-dialog[open] { animation: none; } }
+html:has(dialog[open]) { overflow: hidden; }
+:is(.search-dialog, .request-dialog)::backdrop { background: rgba(94, 31, 38, .65); }
+:is(.search-dialog, .request-dialog)[open] { animation: page-arrive 180ms ease-out; }
+@media (prefers-reduced-motion: reduce) { :is(.search-dialog, .request-dialog)[open] { animation: none; } }
